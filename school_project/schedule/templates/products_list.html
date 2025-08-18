@@ -1,8 +1,87 @@
-<h1>Products</h1>
-<ul>
-    {% for product in products %}
-    <li>
-        <a href="#">{{ product.name }}</a> - ${{ product.price }}
-    </li>
-    {% endfor %}
-</ul>
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Товари</title>
+    <style>
+        body {
+            background: linear-gradient(120deg, #f6d365 0%, #fda085 100%);
+            font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+            padding: 40px 32px;
+        }
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            color: #f76c6c;
+            margin-bottom: 32px;
+        }
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 28px;
+        }
+        .product-card {
+            background: #fafafa;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            padding: 22px 18px;
+            text-align: center;
+            transition: transform 0.18s;
+            position: relative;
+        }
+        .product-card:hover {
+            transform: translateY(-6px) scale(1.03);
+            box-shadow: 0 6px 18px rgba(247, 108, 108, 0.09);
+        }
+        .product-name {
+            font-size: 1.15em;
+            font-weight: 600;
+            color: #f76c6c;
+            margin-bottom: 12px;
+        }
+        .product-price {
+            font-size: 1.12em;
+            color: #272727;
+            margin-bottom: 16px;
+        }
+        .product-link {
+            display: inline-block;
+            padding: 8px 20px;
+            background: #f76c6c;
+            color: #fff;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1em;
+            transition: background 0.18s;
+        }
+        .product-link:hover {
+            background: #faad7c;
+            color: #272727;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Наші товари</h1>
+        <div class="products-grid">
+            {% for product in products %}
+            <div class="product-card">
+                <div class="product-name">{{ product.name }}</div>
+                <div class="product-price">₴{{ product.price }}</div>
+                <a class="product-link" href="{% if product.url %}{{ product.url }}{% else %}#{% endif %}">Детальніше</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>
