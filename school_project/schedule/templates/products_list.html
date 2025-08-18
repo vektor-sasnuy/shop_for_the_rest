@@ -1,7 +1,8 @@
 <h1>Products</h1>
 <ul>
-    {%for product in products%}
+    {% for product in products %}
     <li>
-        <a href=>{{product.name}}</a>-${{product.price}}
+        <a href="#">{{ product.name }}</a> - ${{ product.price }}
     </li>
+    {% endfor %}
 </ul>
