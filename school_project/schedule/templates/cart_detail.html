@@ -1,0 +1,11 @@
+<h2>Мій кошик</h2>
+{% if order and order.items.all %}
+  <ul>
+    {% for item in order.items.all %}
+      <li>{{ item.product.name }} – {{ item.quantity }} × {{ item.product.price }} грн</li>
+    {% endfor %}
+  </ul>
+  <p>Разом: {{ order.items.all|map:"total"|sum }}</p>
+{% else %}
+  <p>Кошик порожній</p>
+{% endif %}
