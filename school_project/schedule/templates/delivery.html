@@ -1,0 +1,56 @@
+{% load static %}
+<!DOCTYPE html><html lang="uk"><head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Доставка — scooter wroom</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>@keyframes fadeInUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}.animate-in{animation:fadeInUp .4s ease both}.glass{background:rgba(255,255,255,.06);backdrop-filter:blur(10px)}</style>
+</head>
+<body class="min-h-screen bg-gradient-to-b from-zinc-950 via-black to-black text-zinc-50">
+<header class="sticky top-0 z-40 border-b border-white/10 bg-black/60 backdrop-blur">
+  <div class="mx-auto max-w-4xl px-4 py-3 flex items-center justify-between">
+    <a href="{% url 'home' %}" class="flex items-center gap-2">
+      <img src="{% static 'images/logo.svg' %}" alt="scooter wroom" class="h-7 w-7" onerror="this.style.display='none'">
+      <span class="text-lg font-semibold text-amber-400">scooter wroom</span>
+    </a>
+    <a href="{% url 'cart_detail' %}" class="rounded-xl px-3 py-2 text-sm hover:bg-white/5">Кошик</a>
+  </div>
+</header>
+
+<main class="mx-auto max-w-4xl px-4 py-8">
+  <h1 class="text-2xl md:text-3xl font-bold mb-6">Доставка</h1>
+
+  <form method="post" class="glass ring-1 ring-white/10 rounded-2xl p-5 space-y-5 animate-in">
+    {% csrf_token %}
+    <div>
+      <label class="block text-sm mb-1">Служба доставки</label>
+      {% with m=delivery.method|default:'nova_poshta' %}
+      <select name="method" class="w-full rounded-xl bg-white/5 px-3 py-2 ring-1 ring-white/10">
+        <option value="nova_poshta" {% if m == 'nova_poshta' %}selected{% endif %}>Нова пошта — {{ prices.nova_poshta }} ₴</option>
+        <option value="ukrposhta" {% if m == 'ukrposhta' %}selected{% endif %}>Укрпошта — {{ prices.ukrposhta }} ₴</option>
+        <option value="meest" {% if m == 'meest' %}selected{% endif %}>Meest — {{ prices.meest }} ₴</option>
+      </select>
+      {% endwith %}
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm mb-1">Місто</label>
+        <input name="city" value="{{ delivery.city|default:'' }}" class="w-full rounded-xl bg-white/5 px-3 py-2 ring-1 ring-white/10" placeholder="Київ">
+      </div>
+      <div>
+        <label class="block text-sm mb-1">Відділення / Адреса</label>
+        <input name="department" value="{{ delivery.department|default:'' }}" class="w-full rounded-xl bg-white/5 px-3 py-2 ring-1 ring-white/10" placeholder="№12 або вул. ..">
+      </div>
+    </div>
+
+    <div class="flex items-center justify-between">
+      <a href="{% url 'cart_detail' %}" class="rounded-xl px-4 py-2 ring-1 ring-white/15 hover:bg-white/5">Назад до кошика</a>
+      <button type="submit" class="rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 px-5 py-2.5 font-semibold hover:from-amber-400 hover:to-yellow-400">
+        Зберегти доставку
+      </button>
+    </div>
+  </form>
+
+  <p class="text-xs text-zinc-400 mt-4">Вибір зберігається у сесії.</p>
+</main>
+</body></html>

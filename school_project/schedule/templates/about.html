@@ -1,0 +1,110 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Про нас — scooter wroom</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes fadeInUp { from {opacity:0; transform: translateY(10px)} to {opacity:1; transform: translateY(0)} }
+    .animate-in { animation: fadeInUp .45s ease both }
+    .glass { background: rgba(255,255,255,.06); backdrop-filter: blur(10px) }
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-b from-zinc-950 via-black to-black text-zinc-50 antialiased">
+
+<header class="sticky top-0 z-40 border-b border-white/10 bg-black/60 backdrop-blur">
+  <div class="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between">
+    <a href="{% url 'home' %}" class="flex items-center gap-2">
+      <img src="{% static 'images/logo.svg' %}" alt="scooter wroom" class="h-7 w-7" onerror="this.style.display='none'">
+      <span class="text-lg font-semibold text-amber-400">scooter wroom</span>
+    </a>
+    <nav class="flex items-center gap-2">
+      <a href="{% url 'product-list' %}" class="rounded-xl px-3 py-2 text-sm hover:bg-white/5 transition">Каталог</a>
+      <a href="{% url 'cart_detail' %}" class="rounded-xl px-3 py-2 text-sm hover:bg-white/5 transition">Кошик</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- Hero -->
+  <section class="relative">
+    <div class="absolute inset-0 bg-[radial-gradient(900px_420px_at_50%_-60%,rgba(245,158,11,.22),transparent)]"></div>
+    <div class="mx-auto max-w-7xl px-4 py-14 relative">
+      <h1 class="text-4xl md:text-6xl font-bold leading-tight animate-in">
+        Про <span class="text-amber-400">scooter wroom</span>
+      </h1>
+      <p class="mt-4 text-zinc-300 max-w-2xl animate-in" style="animation-delay:120ms">
+        Магазин запчастин і аксесуарів для скутерів. Працюємо швидко. Відправляємо по Україні перевіреними службами.
+      </p>
+      <div class="mt-8 flex gap-3 animate-in" style="animation-delay:180ms">
+        <a href="{% url 'product-list' %}" class="rounded-2xl bg-gradient-to-r from-amber-500 to-yellow-500 px-6 py-3 text-sm font-semibold hover:from-amber-400 hover:to-yellow-400">До каталогу</a>
+        <a href="{% url 'delivery' %}" class="rounded-2xl px-6 py-3 text-sm font-semibold ring-1 ring-white/15 hover:bg-white/5">Доставка</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Highlights -->
+  <section class="mx-auto max-w-7xl px-4 pb-10 grid md:grid-cols-3 gap-6">
+    <div class="glass ring-1 ring-white/10 rounded-2xl p-6 animate-in">
+      <h3 class="text-lg font-semibold mb-2">Що ми робимо</h3>
+      <p class="text-sm text-zinc-300">Добираємо надійні деталі під популярні моделі. Консультуємо перед покупкою.</p>
+    </div>
+    <div class="glass ring-1 ring-white/10 rounded-2xl p-6 animate-in" style="animation-delay:80ms">
+      <h3 class="text-lg font-semibold mb-2">Швидка відправка</h3>
+      <p class="text-sm text-zinc-300">Нова пошта, Укрпошта, Meest. Відправлення зручним для вас способом.</p>
+    </div>
+    <div class="glass ring-1 ring-white/10 rounded-2xl p-6 animate-in" style="animation-delay:160ms">
+      <h3 class="text-lg font-semibold mb-2">Чесні ціни</h3>
+      <p class="text-sm text-zinc-300">Без прихованих платежів. Повернення згідно закону.</p>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <section class="mx-auto max-w-7xl px-4 pb-10">
+    <div class="glass ring-1 ring-white/10 rounded-2xl p-6 grid sm:grid-cols-3 gap-6">
+      <div class="text-center">
+        <div class="text-3xl font-extrabold text-yellow-300">24/7</div>
+        <div class="text-xs text-zinc-400 mt-1">Замовлення онлайн</div>
+      </div>
+      <div class="text-center">
+        <div class="text-3xl font-extrabold text-yellow-300">1000+</div>
+        <div class="text-xs text-zinc-400 mt-1">Позицій у каталозі</div>
+      </div>
+      <div class="text-center">
+        <div class="text-3xl font-extrabold text-yellow-300">1–2 дні</div>
+        <div class="text-xs text-zinc-400 mt-1">Середній термін доставки</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Partners -->
+  <section class="mx-auto max-w-7xl px-4 pb-16">
+    <div class="glass ring-1 ring-white/10 rounded-2xl p-6">
+      <h3 class="text-lg font-semibold mb-4">Доставляємо через</h3>
+      <ul class="flex flex-wrap items-center gap-3 text-sm text-zinc-300">
+        <li class="rounded-lg px-3 py-2 ring-1 ring-white/10 bg-white/5">Нова пошта</li>
+        <li class="rounded-lg px-3 py-2 ring-1 ring-white/10 bg-white/5">Укрпошта</li>
+        <li class="rounded-lg px-3 py-2 ring-1 ring-white/10 bg-white/5">Meest</li>
+      </ul>
+      <a href="{% url 'delivery' %}" class="inline-block mt-4 rounded-xl px-4 py-2 ring-1 ring-white/15 hover:bg-white/5 text-sm">Умови доставки</a>
+    </div>
+  </section>
+</main>
+
+<footer class="border-t border-white/10">
+  <div class="mx-auto max-w-7xl px-4 py-10 text-sm text-zinc-400">
+    <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+      <p>© {% now "Y" %} <span class="text-amber-400">scooter wroom</span></p>
+      <nav class="flex items-center gap-4">
+        <a href="{% url 'home' %}" class="hover:text-amber-300 transition">Головна</a>
+        <a href="{% url 'product-list' %}" class="hover:text-amber-300 transition">Каталог</a>
+        <a href="{% url 'delivery' %}" class="hover:text-amber-300 transition">Доставка</a>
+      </nav>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,189 +1,192 @@
-<!DOCTYPE html>
 {% load static %}
+{% load tz %}
+<!DOCTYPE html>
 <html lang="uk">
 <head>
-    <meta charset="UTF-8">
-    <title>Мотокрос Магазин</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f8f9fa;
-            transition: background 0.3s, color 0.3s;
-        }
-        body.dark-theme {
-            background-color: #181a1b;
-            color: #e9ecef;
-        }
-        .hero {
-            background: none;
-            height: auto;
-            color: #222;
-            text-align: center;
-            padding: 48px 0 24px 0;
-        }
-        .hero h1 {
-            font-size: 2.2rem;
-            font-weight: bold;
-            text-shadow: none;
-        }
-        .hero p {
-            font-size: 1.1rem;
-            margin-bottom: 0;
-            text-shadow: none;
-        }
-        .products-section {
-            margin-top: 0;
-            z-index: 2;
-            position: relative;
-        }
-        .product-card {
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-            background: #fff;
-            overflow: hidden;
-            transition: box-shadow 0.2s;
-        }
-        .product-card:hover {
-            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
-        }
-        .card-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-        }
-        .card-text {
-            min-height: 40px;
-        }
-        .product-price {
-            font-size: 1.1rem;
-            color: #d63333;
-            font-weight: bold;
-        }
-        .btn-details {
-            background: #d63333;
-            color: #fff;
-            border-radius: 8px;
-        }
-        .btn-details:hover {
-            background: #a71d2a;
-        }
-        footer {
-            background: #212529;
-            color: #fff;
-            padding: 20px 0;
-            text-align: center;
-        }
-        .theme-toggle {
-            position: absolute;
-            top: 30px;
-            right: 30px;
-            z-index: 10;
-        }
-        .dark-theme .card,
-        .dark-theme .product-card {
-            background: #23272b;
-            color: #e9ecef;
-        }
-        .dark-theme .card-title,
-        .dark-theme .card-text,
-        .dark-theme .product-price {
-            color: #e9ecef;
-        }
-        .dark-theme .btn-details {
-            background: #495057;
-            color: #fff;
-        }
-        .dark-theme .btn-details:hover {
-            background: #343a40;
-        }
-        .dark-theme footer {
-            background: #111315;
-            color: #e9ecef;
-        }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>scooter wroom — Головна</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    @keyframes fadeInUp { from {opacity:0; transform: translateY(12px)} to {opacity:1; transform: translateY(0)} }
+    @keyframes cardPop { 0% {transform: translateY(0) scale(1)} 100% {transform: translateY(-2px) scale(1.01)} }
+    @keyframes shimmer { 0%{background-position: 0% 50%} 100%{background-position: 200% 50%} }
+    .animate-in { animation: fadeInUp .6s ease both }
+    .text-shimmer {
+      background: linear-gradient(90deg,#fef9c3,#fde047,#fef9c3);
+      background-size: 200% 100%;
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      animation: shimmer 3.5s linear infinite;
+    }
+    .glass { background: rgba(255,255,255,.06); backdrop-filter: blur(10px) }
+  </style>
 </head>
-<body>
-    <button class="btn btn-outline-secondary theme-toggle" id="themeToggle" title="Перемкнути тему">
-        <span id="themeIcon">🌙</span>
-    </button>
 
-    <!-- Hero секція -->
-    <section class="hero">
-        <h1>Мотокрос Магазин</h1>
-        <p>Екіпірування, мотоцикли та запчастини</p>
-    </section>
+<body class="min-h-screen bg-gradient-to-b from-zinc-950 via-black to-black text-zinc-50 antialiased">
+  <!-- Header -->
+  <header class="sticky top-0 z-40 border-b border-white/10 bg-black/60 backdrop-blur">
+    <div class="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between">
+      <a href="{% url 'home' %}" class="flex items-center gap-2">
+        <img src="{% static 'images/logo.svg' %}" alt="scooter wroom" class="h-7 w-7" onerror="this.style.display='none'">
+        <span class="text-lg font-semibold text-amber-400">scooter wroom</span>
+      </a>
 
-    <!-- Блок про магазин -->
-    <section class="container mb-4">
-        <div class="p-4 bg-white rounded-3 shadow-sm text-center">
-            <h2 class="mb-2" style="font-size:1.4rem; font-weight:600;">Чому обирають нас?</h2>
-            <p class="mb-1">Ми — команда справжніх фанатів мотокросу!</p>
-            <ul class="list-unstyled mb-0">
-                <li>✔️ Тільки перевірені бренди та якісні товари</li>
-                <li>✔️ Швидка доставка по всій Україні</li>
-                <li>✔️ Професійна консультація для кожного клієнта</li>
-                <li>✔️ Постійні акції та знижки</li>
-            </ul>
+      <form action="{% url 'product-list' %}" method="get" class="hidden md:flex items-center gap-2 w-full max-w-md">
+        <input name="q" type="search" placeholder="Пошук запчастин і аксесуарів"
+               class="w-full rounded-xl bg-white/5 px-4 py-2.5 text-sm outline-none ring-1 ring-white/10 focus:ring-2 focus:ring-amber-400" />
+        <button class="rounded-xl bg-amber-500 px-4 py-2.5 text-sm font-medium hover:bg-amber-400 transition">
+          Знайти
+        </button>
+      </form>
+
+      <nav class="flex items-center gap-2">
+        <a href="{% url 'cart_detail' %}" class="rounded-xl px-3 py-2 text-sm hover:bg-white/5 transition">Кошик</a>
+        <a href="/account/" class="rounded-xl px-3 py-2 text-sm hover:bg-white/5 transition">Акаунт</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="relative">
+    <div class="absolute inset-0 bg-[radial-gradient(900px_420px_at_50%_-60%,rgba(245,158,11,.22),transparent)]"></div>
+    <div class="mx-auto max-w-7xl px-4 py-16 md:py-24 relative">
+      <div class="grid md:grid-cols-2 gap-10 items-center">
+        <div class="animate-in">
+          <h1 class="text-4xl md:text-6xl font-bold leading-tight">
+            <span class="text-shimmer">scooter wroom</span><br/>
+            запчастини та аксесуари для скутерів
+          </h1>
+          <p class="mt-4 text-zinc-300">
+            Перевірені бренди. Швидка доставка. Чесні ціни.
+          </p>
+          <div class="mt-8 flex items-center gap-3">
+            {% if show_catalog_btn %}
+              <a href="{% url 'product-list' %}"
+                 class="rounded-2xl bg-gradient-to-r from-amber-500 to-yellow-500 px-6 py-3 text-sm font-semibold hover:from-amber-400 hover:to-yellow-400 transition">
+                Перейти до каталогу
+              </a>
+            {% endif %}
+            <a href="#products" class="rounded-2xl px-6 py-3 text-sm font-semibold ring-1 ring-white/15 hover:bg-white/5 transition">
+              Популярне зараз
+            </a>
+          </div>
         </div>
-    </section>
 
-    <!-- Секція продуктів -->
-    <section id="products" class="products-section container py-4">
-        {% if show_catalog_btn %}
-        <div class="text-end mb-3">
-            <a href="{% url 'product-list' %}" class="btn btn-outline-primary">Весь каталог</a>
-        </div>
-        {% endif %}
-        <div class="row g-4">
-            {% for product in products %}
-            <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-                <div class="card product-card h-100">
-                    <div class="card-body d-flex flex-column">
-                         {% if product.image %}
-                        <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
-                        {% else %}
-                        <img src="{% static 'img/no-image.png' %}" class="card-img-top" alt="Немає зображення">
-                        {% endif %}
-                        <h5 class="card-title">{{ product.name }}</h5>
-                        <p class="card-text">{{ product.description }}</p>
-                        {% if product.price %}
-                        <div class="product-price mb-2">{{ product.price }} грн</div>
-                        {% endif %}
-                        <a href="{% url 'product-detail' product.id %}" class="btn btn-details mt-auto">Детальніше</a>
-                    </div>
-                </div>
+        <div class="relative animate-in md:[animation-delay:120ms]">
+          <div class="aspect-[4/3] rounded-3xl glass ring-1 ring-white/10 p-2 md:p-3">
+            <img
+              src="{% static 'images/hero.webp' %}"
+              alt="Скутери та запчастини — scooter wroom"
+              class="h-full w-full rounded-2xl object-cover"
+              loading="lazy"
+              onerror="this.style.display='none'">
+          </div>
+          <div class="absolute -bottom-6 -right-6 hidden md:block">
+            <div class="rounded-2xl bg-amber-500/20 text-amber-200 px-4 py-2 text-xs ring-1 ring-amber-400/30">
+              Доставка від 1 дня
             </div>
-            {% endfor %}
+          </div>
         </div>
-    </section>
+      </div>
+    </div>
+  </section>
 
-    <!-- Footer -->
-    <footer>
-        <p>© 2025 Мотокрос Магазин | Всі права захищені</p>
-    </footer>
+  <!-- Products -->
+  <section id="products" class="mx-auto max-w-7xl px-4 pb-20">
+    <div class="mb-6 flex items-end justify-between">
+      <div>
+        <h2 class="text-2xl md:text-3xl font-semibold">Популярні товари</h2>
+        <p class="text-zinc-400 text-sm mt-1">Перші 8 позицій з каталогу</p>
+      </div>
+      <a href="{% url 'product-list' %}" class="hidden md:inline-block text-sm text-amber-400 hover:text-amber-300 transition">Весь каталог</a>
+    </div>
 
-    <script>
-        // Theme toggle logic
-        const themeToggle = document.getElementById('themeToggle');
-        const themeIcon = document.getElementById('themeIcon');
-        function setTheme(dark) {
-            if (dark) {
-                document.body.classList.add('dark-theme');
-                themeIcon.textContent = '☀️';
-                localStorage.setItem('theme', 'dark');
-            } else {
-                document.body.classList.remove('dark-theme');
-                themeIcon.textContent = '🌙';
-                localStorage.setItem('theme', 'light');
-            }
-        }
-        themeToggle.addEventListener('click', () => {
-            setTheme(!document.body.classList.contains('dark-theme'));
-        });
-        // On load
-        if (localStorage.getItem('theme') === 'dark') {
-            setTheme(true);
-        }
-    </script>
+    {% if products %}
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {% for product in products %}
+          {% widthratio forloop.counter0 1 120 as delay %}
+          <article
+            class="group relative rounded-2xl glass ring-1 ring-white/10 p-3 hover:ring-yellow-200/30 transition animate-in"
+            style="animation-delay: {{ delay }}ms">
+            <a href="{% url 'product-detail' product.pk %}" class="block">
+              <div class="relative aspect-square overflow-hidden rounded-xl">
+                {% if product.image %}
+                  <img
+                    src="{{ product.image.url }}"
+                    alt="{{ product.name }}"
+                    class="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03] group-hover:rotate-[.4deg]"
+                    loading="lazy" />
+                {% else %}
+                  <img
+                    src="{% static 'images/placeholder-product.webp' %}"
+                    alt="{{ product.name }}"
+                    class="h-full w-full object-cover opacity-90 transition duration-300 group-hover:scale-[1.03]"
+                    loading="lazy" />
+                {% endif %}
+
+                {% if product.stock|default:0 <= 0 %}
+                  <span class="absolute left-2 top-2 rounded-md bg-red-500/85 px-2 py-1 text-[11px] font-semibold">
+                    Немає в наявності
+                  </span>
+                {% else %}
+                  <span class="absolute left-2 top-2 rounded-md bg-amber-500/85 px-2 py-1 text-[11px] font-semibold">
+                    В наявності: {{ product.stock }}
+                  </span>
+                {% endif %}
+              </div>
+
+              <div class="mt-3 space-y-2">
+                <h3 class="line-clamp-2 text-sm font-semibold leading-snug">{{ product.name }}</h3>
+
+                <div class="flex items-center justify-between">
+                  <div class="text-base font-bold text-yellow-300">
+                    {{ product.price }} ₴
+                  </div>
+                  <div class="text-[11px] text-yellow-200/90 px-2 py-1 rounded-md ring-1 ring-yellow-300/30">
+                    {{ product.category.name }}
+                  </div>
+                </div>
+
+                <p class="line-clamp-2 text-xs text-zinc-300/90">
+                  {{ product.description }}
+                </p>
+              </div>
+            </a>
+
+            <form action="{% url 'add_to_cart' product.pk %}" method="post" class="mt-3">
+              {% csrf_token %}
+              <button
+                type="submit"
+                class="w-full rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 px-4 py-2.5 text-sm font-semibold
+                       hover:from-amber-400 hover:to-yellow-400 transition [animation:cardPop_.2s_ease-in-out]
+                       active:scale-[.99] focus:outline-none focus:ring-2 focus:ring-amber-400">
+                Додати в кошик
+              </button>
+            </form>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="rounded-2xl glass ring-1 ring-white/10 p-10 text-center">
+        <p class="text-zinc-300">Наразі немає товарів для відображення</p>
+      </div>
+    {% endif %}
+  </section>
+
+  <!-- Footer -->
+  <footer class="border-t border-white/10">
+    <div class="mx-auto max-w-7xl px-4 py-10 text-sm text-zinc-400">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+        <p>© {% now "Y" %} <span class="text-amber-400">scooter wroom</span></p>
+        <nav class="flex items-center gap-4">
+          <a href="/about/" class="hover:text-amber-300 transition">Про нас</a>
+          <a href="/delivery/" class="hover:text-amber-300 transition">Доставка</a>
+          <a href="/contacts/" class="hover:text-amber-300 transition">Контакти</a>
+        </nav>
+      </div>
+    </div>
+  </footer>
 </body>
 </html>

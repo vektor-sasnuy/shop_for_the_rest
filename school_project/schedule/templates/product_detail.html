@@ -1,59 +1,143 @@
-<!DOCTYPE html>
 {% load static %}
+<!DOCTYPE html>
 <html lang="uk">
 <head>
-    <meta charset="UTF-8">
-    <title>{{ product.name }}</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <style>
-        .product-img {
-            max-width: 320px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-        .product-price {
-            font-size: 1.3rem;
-            font-weight: bold;
-            color: #d63333;
-            margin-bottom: 10px;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>{{ product.name }} — scooter wroom</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes fadeInUp { from {opacity:0; transform: translateY(10px)} to {opacity:1; transform: translateY(0)} }
+    .animate-in { animation: fadeInUp .45s ease both }
+    .glass { background: rgba(255,255,255,.06); backdrop-filter: blur(10px) }
+  </style>
 </head>
-<body>
-<div class="container mt-4 text-center">
-    <h1 class="product-title">{{ product.name }}</h1>
-    {% if product.image %}
-        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-img">
-    {% endif %}
+<body class="min-h-screen bg-gradient-to-b from-zinc-950 via-black to-black text-zinc-50 antialiased">
 
-    <div class="product-price">{{ product.price }} грн</div>
-    <div class="product-description">{{ product.description }}</div>
+  <!-- Header -->
+  <header class="sticky top-0 z-40 border-b border-white/10 bg-black/60 backdrop-blur">
+    <div class="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between">
+      <a href="{% url 'home' %}" class="flex items-center gap-2">
+        <img src="{% static 'images/logo.svg' %}" alt="scooter wroom" class="h-7 w-7" onerror="this.style.display='none'">
+        <span class="text-lg font-semibold text-amber-400">scooter wroom</span>
+      </a>
+      <nav class="flex items-center gap-2">
+        <a href="{% url 'product-list' %}" class="rounded-xl px-3 py-2 text-sm hover:bg-white/5 transition">Каталог</a>
+        <a href="{% url 'cart_detail' %}" class="rounded-xl px-3 py-2 text-sm hover:bg-white/5 transition">Кошик</a>
+      </nav>
+    </div>
+  </header>
 
-    {% if product.category %}
-        <div class="product-info"><b>Категорія:</b> {{ product.category }}</div>
-    {% endif %}
+  <!-- Content -->
+  <main class="mx-auto max-w-7xl px-4 py-10">
+    <!-- Breadcrumbs -->
+    <nav class="text-xs text-zinc-400 mb-6">
+      <a href="{% url 'home' %}" class="hover:text-amber-300 transition">Головна</a>
+      <span class="mx-2 text-zinc-600">/</span>
+      <a href="{% url 'product-list' %}" class="hover:text-amber-300 transition">Каталог</a>
+      <span class="mx-2 text-zinc-600">/</span>
+      <span class="text-zinc-300">{{ product.name }}</span>
+    </nav>
 
-    <form method="post" action="{% url 'add_to_cart' product.id %}" class="mt-3">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-primary">Додати в кошик</button>
-    </form>
+    <section class="grid lg:grid-cols-2 gap-8 items-start">
+      <!-- Image -->
+      <div class="glass ring-1 ring-white/10 rounded-2xl p-3 animate-in">
+        <div class="relative aspect-square overflow-hidden rounded-xl">
+          {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="h-full w-full object-cover" loading="lazy">
+          {% else %}
+            <img src="{% static 'images/placeholder-product.webp' %}" alt="{{ product.name }}" class="h-full w-full object-cover opacity-90" loading="lazy">
+          {% endif %}
+          {% if product.stock|default:0 <= 0 %}
+            <span class="absolute left-3 top-3 rounded-md bg-red-500/85 px-2 py-1 text-[11px] font-semibold">Немає в наявності</span>
+          {% else %}
+            <span class="absolute left-3 top-3 rounded-md bg-amber-500/85 px-2 py-1 text-[11px] font-semibold">В наявності: {{ product.stock }}</span>
+          {% endif %}
+        </div>
+      </div>
 
-    <a href="{% url 'product-list' %}" class="btn btn-outline-secondary mt-2">Назад до каталогу</a>
+      <!-- Info -->
+      <div class="space-y-5 animate-in" style="animation-delay:120ms">
+        <h1 class="text-2xl md:text-3xl font-bold">{{ product.name }}</h1>
 
-    <hr class="my-4">
+        <div class="flex items-center gap-3">
+          <div class="text-2xl font-extrabold text-yellow-300">{{ product.price }} ₴</div>
+          {% if product.category %}
+            <span class="text-[12px] text-yellow-200/90 px-2 py-1 rounded-md ring-1 ring-yellow-300/30">
+              {{ product.category.name }}
+            </span>
+          {% endif %}
+        </div>
 
-    <h3>Останні замовлення з цим товаром</h3>
-    <ul class="list-group">
-        {% for order in orders %}
-            <li class="list-group-item">
-                <b>Замовлення №{{ order.id }}</b> — {{ order.customer }}
-                <span class="badge bg-info text-dark">{{ order.status }}</span>
-                <small class="text-muted">{{ order.created_at|date:"d.m.Y H:i" }}</small>
+        <p class="text-sm text-zinc-300 leading-relaxed whitespace-pre-line">
+          {{ product.description|default:"Опис відсутній." }}
+        </p>
+
+        <form method="post" action="{% url 'add_to_cart' product.pk %}" class="pt-2">
+          {% csrf_token %}
+          <button type="submit"
+                  class="rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 px-6 py-3 text-sm font-semibold
+                         hover:from-amber-400 hover:to-yellow-400 transition active:scale-[.99]
+                         focus:outline-none focus:ring-2 focus:ring-amber-400">
+            Додати в кошик
+          </button>
+          <a href="{% url 'product-list' %}"
+             class="ml-3 rounded-xl px-6 py-3 text-sm font-semibold ring-1 ring-white/15 hover:bg-white/5 transition">
+            Назад до каталогу
+          </a>
+        </form>
+      </div>
+    </section>
+
+    <!-- Orders -->
+    <section class="mt-12">
+      <h2 class="text-xl font-semibold mb-4">Останні замовлення з цим товаром</h2>
+
+      {% if orders %}
+        <ul class="space-y-3">
+          {% for order in orders %}
+            <li class="glass ring-1 ring-white/10 rounded-xl p-4 flex items-center justify-between">
+              <div class="text-sm">
+                <div class="font-semibold">Замовлення №{{ order.id }}</div>
+                <div class="text-zinc-400">Клієнт: {{ order.customer }}</div>
+              </div>
+              <div class="flex items-center gap-3 text-xs">
+                <span class="rounded-md px-2 py-1 ring-1 ring-white/10 bg-white/5">
+                  {{ order.created_at|date:"d.m.Y H:i" }}
+                </span>
+                <span class="rounded-md px-2 py-1
+                  {% if order.status == 'delivered' %} bg-emerald-500/20 text-emerald-200 ring-emerald-400/30
+                  {% elif order.status == 'shipped' %} bg-sky-500/20 text-sky-200 ring-sky-400/30
+                  {% else %} bg-amber-500/20 text-amber-200 ring-amber-400/30 {% endif %}
+                  ring-1">
+                  {{ order.status }}
+                </span>
+              </div>
             </li>
-        {% empty %}
-            <li class="list-group-item">Цей товар ще не замовляли</li>
-        {% endfor %}
-    </ul>
-</div>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <div class="glass ring-1 ring-white/10 rounded-xl p-6 text-sm text-zinc-300">
+          Цей товар ще не замовляли.
+        </div>
+      {% endif %}
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-white/10 mt-12">
+    <div class="mx-auto max-w-7xl px-4 py-10 text-sm text-zinc-400">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+        <p>© {% now "Y" %} <span class="text-amber-400">scooter wroom</span></p>
+        <nav class="flex items-center gap-4">
+          <a href="{% url 'home' %}" class="hover:text-amber-300 transition">Головна</a>
+          <a href="{% url 'product-list' %}" class="hover:text-amber-300 transition">Каталог</a>
+          <a href="{% url 'cart_detail' %}" class="hover:text-amber-300 transition">Кошик</a>
+        </nav>
+      </div>
+    </div>
+  </footer>
+
 </body>
 </html>

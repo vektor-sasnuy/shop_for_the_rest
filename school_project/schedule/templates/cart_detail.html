@@ -1,11 +1,139 @@
-<h2>Мій кошик</h2>
-{% if order and order.items.all %}
-  <ul>
-    {% for item in order.items.all %}
-      <li>{{ item.product.name }} – {{ item.quantity }} × {{ item.product.price }} грн</li>
-    {% endfor %}
-  </ul>
-  <p>Разом: {{ order.items.all|map:"total"|sum }}</p>
-{% else %}
-  <p>Кошик порожній</p>
-{% endif %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Кошик — scooter wroom</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes fadeInUp { from {opacity:0; transform: translateY(8px)} to {opacity:1; transform: translateY(0)} }
+    .animate-in { animation: fadeInUp .4s ease both }
+    .glass { background: rgba(255,255,255,.06); backdrop-filter: blur(10px) }
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-b from-zinc-950 via-black to-black text-zinc-50 antialiased">
+
+<header class="sticky top-0 z-40 border-b border-white/10 bg-black/60 backdrop-blur">
+  <div class="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between">
+    <a href="{% url 'home' %}" class="flex items-center gap-2">
+      <img src="{% static 'images/logo.svg' %}" alt="scooter wroom" class="h-7 w-7" onerror="this.style.display='none'">
+      <span class="text-lg font-semibold text-amber-400">scooter wroom</span>
+    </a>
+    <nav class="flex items-center gap-2">
+      <a href="{% url 'product-list' %}" class="rounded-xl px-3 py-2 text-sm hover:bg-white/5 transition">Каталог</a>
+    </nav>
+  </div>
+</header>
+
+<main class="mx-auto max-w-7xl px-4 py-10">
+  <h1 class="text-2xl md:text-3xl font-bold mb-6">Кошик</h1>
+
+  {% if rows %}
+  <div class="glass ring-1 ring-white/10 rounded-2xl overflow-hidden animate-in">
+    <div class="divide-y divide-white/10">
+      {% for r in rows %}
+        {% with item=r.item p=r.item.product %}
+        <div class="p-3 md:p-4 flex items-center gap-3 md:gap-5">
+          <div class="w-20 h-20 rounded-lg overflow-hidden bg-white/5 shrink-0">
+            {% if p.image %}
+              <img src="{{ p.image.url }}" alt="{{ p.name }}" class="w-full h-full object-cover">
+            {% else %}
+              <img src="{% static 'images/placeholder-product.webp' %}" alt="{{ p.name }}" class="w-full h-full object-cover opacity-80">
+            {% endif %}
+          </div>
+
+          <div class="flex-1">
+            <div class="text-sm font-semibold">{{ p.name }}</div>
+            <div class="text-xs text-zinc-400 mt-1">Категорія: {{ p.category.name }}</div>
+            <div class="text-xs text-zinc-400 mt-1">Ціна: {{ p.price }} ₴</div>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <form method="post" action="{% url 'cart_item_update' item.id %}">
+              {% csrf_token %}
+              <input type="hidden" name="action" value="dec">
+              <button class="rounded-lg px-3 py-2 ring-1 ring-white/15 hover:bg-white/5">−</button>
+            </form>
+
+            <div class="w-8 text-center text-sm font-semibold">{{ item.quantity }}</div>
+
+            <form method="post" action="{% url 'cart_item_update' item.id %}">
+              {% csrf_token %}
+              <input type="hidden" name="action" value="inc">
+              <button class="rounded-lg px-3 py-2 ring-1 ring-white/15 hover:bg-white/5">+</button>
+            </form>
+
+            <form method="post" action="{% url 'cart_item_update' item.id %}">
+              {% csrf_token %}
+              <input type="hidden" name="action" value="remove">
+              <button class="ml-2 rounded-lg px-3 py-2 ring-1 ring-white/15 hover:bg-white/5 text-red-300">✕</button>
+            </form>
+          </div>
+
+          <div class="w-28 text-right text-yellow-300 font-bold">
+            {{ r.subtotal }} ₴
+          </div>
+        </div>
+        {% endwith %}
+      {% endfor %}
+    </div>
+    <div class="mt-6 space-y-2 text-sm">
+  <div class="flex items-center justify-between">
+    <span class="text-zinc-300">Проміжний підсумок</span>
+    <span>{{ subtotal }} ₴</span>
+  </div>
+  <div class="flex items-center justify-between">
+    <span class="text-zinc-300">
+      Доставка
+      {% if delivery %}
+        — {% if delivery.method == 'nova_poshta' %}Нова пошта{% elif delivery.method == 'ukrposhta' %}Укрпошта{% else %}Meest{% endif %}
+        ({{ delivery.city }}{% if delivery.department %}, {{ delivery.department }}{% endif %})
+      {% else %}(не вибрано){% endif %}
+    </span>
+    <span>{{ delivery.price|default:0 }} ₴</span>
+  </div>
+  <div class="flex items-center justify-between text-lg md:text-xl">
+    <span>Разом</span>
+    <span class="text-yellow-300 font-extrabold">{{ total_price }} ₴</span>
+  </div>
+  <a href="{% url 'delivery' %}" class="inline-block mt-2 rounded-xl px-4 py-2 ring-1 ring-white/15 hover:bg-white/5">Змінити доставку</a>
+</div>
+
+  </div>
+
+  <div class="mt-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+    <form method="post" action="{% url 'cart_clear' %}">
+      {% csrf_token %}
+      <button class="rounded-xl px-4 py-2 text-sm ring-1 ring-white/15 hover:bg-white/5">Очистити кошик</button>
+    </form>
+
+    <div class="text-lg md:text-xl">
+      Разом: <span class="text-yellow-300 font-extrabold">{{ total_price }} ₴</span>
+    </div>
+  </div>
+
+  <div class="mt-4 flex items-center gap-3">
+    <a href="{% url 'product-list' %}" class="rounded-xl px-5 py-3 text-sm font-semibold ring-1 ring-white/15 hover:bg-white/5">Продовжити покупки</a>
+    <a href="#" class="rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 px-5 py-3 text-sm font-semibold hover:from-amber-400 hover:to-yellow-400">Оформити замовлення</a>
+  </div>
+
+  {% else %}
+    <div class="glass ring-1 ring-white/10 rounded-2xl p-8 text-center animate-in">
+      <p class="text-zinc-300">Кошик порожній.</p>
+      <a href="{% url 'product-list' %}" class="inline-block mt-4 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 px-5 py-3 text-sm font-semibold hover:from-amber-400 hover:to-yellow-400">До каталогу</a>
+    </div>
+  {% endif %}
+</main>
+
+<footer class="border-t border-white/10 mt-12">
+  <div class="mx-auto max-w-7xl px-4 py-10 text-sm text-zinc-400">
+    <div class="flex items-center justify-between">
+      <p>© {% now "Y" %} <span class="text-amber-400">scooter wroom</span></p>
+      <a href="{% url 'home' %}" class="hover:text-amber-300 transition">Головна</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

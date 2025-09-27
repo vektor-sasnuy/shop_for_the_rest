@@ -1,87 +1,110 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-    <meta charset="UTF-8">
-    <title>Товари</title>
-    <style>
-        body {
-            background: linear-gradient(120deg, #f6d365 0%, #fda085 100%);
-            font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            max-width: 900px;
-            margin: 40px auto;
-            background: #fff;
-            border-radius: 18px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.12);
-            padding: 40px 32px;
-        }
-        h1 {
-            text-align: center;
-            font-size: 2.5em;
-            color: #f76c6c;
-            margin-bottom: 32px;
-        }
-        .products-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 28px;
-        }
-        .product-card {
-            background: #fafafa;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-            padding: 22px 18px;
-            text-align: center;
-            transition: transform 0.18s;
-            position: relative;
-        }
-        .product-card:hover {
-            transform: translateY(-6px) scale(1.03);
-            box-shadow: 0 6px 18px rgba(247, 108, 108, 0.09);
-        }
-        .product-name {
-            font-size: 1.15em;
-            font-weight: 600;
-            color: #f76c6c;
-            margin-bottom: 12px;
-        }
-        .product-price {
-            font-size: 1.12em;
-            color: #272727;
-            margin-bottom: 16px;
-        }
-        .product-link {
-            display: inline-block;
-            padding: 8px 20px;
-            background: #f76c6c;
-            color: #fff;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 1em;
-            transition: background 0.18s;
-        }
-        .product-link:hover {
-            background: #faad7c;
-            color: #272727;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>scooter wroom — Каталог</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes fadeInUp { from {opacity:0; transform: translateY(10px)} to {opacity:1; transform: translateY(0)} }
+    .animate-in { animation: fadeInUp .5s ease both }
+    .glass { background: rgba(255,255,255,.06); backdrop-filter: blur(10px) }
+  </style>
 </head>
-<body>
-    <div class="container">
-        <h1>Наші товари</h1>
-        <div class="products-grid">
-            {% for product in products %}
-            <div class="product-card">
-                <div class="product-name">{{ product.name }}</div>
-                <div class="product-price">₴{{ product.price }}</div>
-                <a class="product-link" href="{% if product.url %}{{ product.url }}{% else %}#{% endif %}">Детальніше</a>
-            </div>
-            {% endfor %}
-        </div>
+<body class="min-h-screen bg-gradient-to-b from-zinc-950 via-black to-black text-zinc-50 antialiased">
+
+  <!-- Header -->
+  <header class="sticky top-0 z-40 border-b border-white/10 bg-black/60 backdrop-blur">
+    <div class="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between">
+      <a href="{% url 'home' %}" class="flex items-center gap-2">
+        <img src="{% static 'images/logo.svg' %}" alt="scooter wroom" class="h-7 w-7" onerror="this.style.display='none'">
+        <span class="text-lg font-semibold text-amber-400">scooter wroom</span>
+      </a>
+      <nav class="flex items-center gap-2">
+        <a href="{% url 'cart_detail' %}" class="rounded-xl px-3 py-2 text-sm hover:bg-white/5 transition">Кошик</a>
+      </nav>
     </div>
+  </header>
+
+  <!-- Title -->
+  <section class="mx-auto max-w-7xl px-4 pt-10 pb-6">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-3xl md:text-4xl font-bold">Каталог</h1>
+        <p class="text-zinc-400 text-sm mt-1">Всі доступні товари</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Grid -->
+  <section class="mx-auto max-w-7xl px-4 pb-16">
+    {% if products %}
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {% for product in products %}
+          {% widthratio forloop.counter0 1 100 as delay %}
+          <article class="group relative rounded-2xl glass ring-1 ring-white/10 p-3 hover:ring-yellow-200/30 transition animate-in"
+                   style="animation-delay: {{ delay }}ms">
+            <a href="{% url 'product-detail' product.pk %}" class="block">
+              <div class="relative aspect-square overflow-hidden rounded-xl">
+                {% if product.image %}
+                  <img src="{{ product.image.url }}" alt="{{ product.name }}"
+                       class="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]" loading="lazy">
+                {% else %}
+                  <img src="{% static 'images/placeholder-product.webp' %}" alt="{{ product.name }}"
+                       class="h-full w-full object-cover opacity-90 transition duration-300 group-hover:scale-[1.03]" loading="lazy">
+                {% endif %}
+
+                {% if product.stock|default:0 <= 0 %}
+                  <span class="absolute left-2 top-2 rounded-md bg-red-500/85 px-2 py-1 text-[11px] font-semibold">Немає</span>
+                {% else %}
+                  <span class="absolute left-2 top-2 rounded-md bg-amber-500/85 px-2 py-1 text-[11px] font-semibold">В наявності: {{ product.stock }}</span>
+                {% endif %}
+              </div>
+
+              <div class="mt-3 space-y-2">
+                <h2 class="line-clamp-2 text-sm font-semibold leading-snug">{{ product.name }}</h2>
+                <div class="flex items-center justify-between">
+                  <div class="text-base font-bold text-yellow-300">{{ product.price }} ₴</div>
+                  <div class="text-[11px] text-yellow-200/90 px-2 py-1 rounded-md ring-1 ring-yellow-300/30">
+                    {{ product.category.name }}
+                  </div>
+                </div>
+              </div>
+            </a>
+
+            <form action="{% url 'add_to_cart' product.pk %}" method="post" class="mt-3">
+              {% csrf_token %}
+              <button type="submit"
+                      class="w-full rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 px-4 py-2.5 text-sm font-semibold
+                             hover:from-amber-400 hover:to-yellow-400 transition active:scale-[.99]
+                             focus:outline-none focus:ring-2 focus:ring-amber-400">
+                Додати в кошик
+              </button>
+            </form>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="rounded-2xl glass ring-1 ring-white/10 p-10 text-center">
+        <p class="text-zinc-300">Наразі немає товарів</p>
+      </div>
+    {% endif %}
+  </section>
+
+  <!-- Footer -->
+  <footer class="border-t border-white/10">
+    <div class="mx-auto max-w-7xl px-4 py-10 text-sm text-zinc-400">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+        <p>© {% now "Y" %} <span class="text-amber-400">scooter wroom</span></p>
+        <nav class="flex items-center gap-4">
+          <a href="/" class="hover:text-amber-300 transition">Головна</a>
+          <a href="{% url 'product-list' %}" class="hover:text-amber-300 transition">Каталог</a>
+        </nav>
+      </div>
+    </div>
+  </footer>
+
 </body>
 </html>
